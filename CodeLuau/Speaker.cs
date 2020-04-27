@@ -12,7 +12,7 @@ namespace CodeLuau
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public int? YearsEXperience { get; set; }
+        public int? YearsExperience { get; set; }
         public bool HasBlog { get; set; }
         public string BlogURL { get; set; }
         public WebBrowser Browser { get; set; }
@@ -32,9 +32,7 @@ namespace CodeLuau
             var error = ValidateData();
             if (error != null) return new RegisterResponse(error);
 
-            var  preferredEmployers = new List<string>() { "Pluralsight", "Microsoft", "Google" };
-
-            bool speakerAppearsQualified = YearsEXperience > 10 || HasBlog || Certifications.Count() > 3 || preferredEmployers.Contains(Employer);
+            bool speakerAppearsQualified = AppearsExceptional();
 
             if (!speakerAppearsQualified)
             {
@@ -82,19 +80,19 @@ namespace CodeLuau
                     //let's go ahead and register him/her now.
                     //First, let's calculate the registration fee. 
                     //More experienced speakers pay a lower fee.
-                    if (YearsEXperience <= 1)
+                    if (YearsExperience <= 1)
                     {
                         RegistrationFee = 500;
                     }
-                    else if (YearsEXperience >= 2 && YearsEXperience <= 3)
+                    else if (YearsExperience >= 2 && YearsExperience <= 3)
                     {
                         RegistrationFee = 250;
                     }
-                    else if (YearsEXperience >= 4 && YearsEXperience <= 5)
+                    else if (YearsExperience >= 4 && YearsExperience <= 5)
                     {
                         RegistrationFee = 100;
                     }
-                    else if (YearsEXperience >= 6 && YearsEXperience <= 9)
+                    else if (YearsExperience >= 6 && YearsExperience <= 9)
                     {
                         RegistrationFee = 50;
                     }
@@ -126,6 +124,16 @@ namespace CodeLuau
 
             //if we got this far, the speaker is registered.
             return new RegisterResponse((int)speakerId);
+        }
+
+        private bool AppearsExceptional()
+        {
+            if (YearsExperience > 10) return true;
+            if (HasBlog) return true;
+            if (Certifications.Count() > 3) return true;
+            var preferredEmployers = new List<string>() { "Pluralsight", "Microsoft", "Google" };
+            if (preferredEmployers.Contains(Employer)) return true;
+            return false;
         }
 
         private RegisterError? ValidateData()
