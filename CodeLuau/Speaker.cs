@@ -48,6 +48,33 @@ namespace CodeLuau
             return null;
         }
 
+        private RegisterError? ValidateData()
+        {
+            if (string.IsNullOrWhiteSpace(FirstName)) return RegisterError.FirstNameRequired;
+            if (string.IsNullOrWhiteSpace(LastName)) return RegisterError.LastNameRequired;
+            if (string.IsNullOrWhiteSpace(Email)) return RegisterError.EmailRequired;
+            if (!Sessions.Any()) return RegisterError.NoSessionsProvided;
+            return null;
+        }
+        private bool HasObviousRedFlags()
+        {
+            string emailDomain = Email.Split('@').Last();
+            var ancientEmailDomains = new List<string>() { "aol.com", "prodigy.com", "compuserve.com" };
+
+            if (ancientEmailDomains.Contains(emailDomain)) return true;
+            if (Browser.Name == WebBrowser.BrowserName.InternetExplorer && Browser.MajorVersion < 9) return true;
+            return false;
+        }
+
+        private bool AppearsExceptional()
+        {
+            if (YearsExperience > 10) return true;
+            if (HasBlog) return true;
+            if (Certifications.Count() > 3) return true;
+            var preferredEmployers = new List<string>() { "Pluralsight", "Microsoft", "Google" };
+            if (preferredEmployers.Contains(Employer)) return true;
+            return false;
+        }
         private bool ApproveSessions()
         {
             foreach (var session in Sessions)
@@ -70,34 +97,6 @@ namespace CodeLuau
             }
 
             return false;
-        }
-        private bool HasObviousRedFlags()
-        {
-            string emailDomain = Email.Split('@').Last();
-            var ancientEmailDomains = new List<string>() { "aol.com", "prodigy.com", "compuserve.com" };
-
-            if (ancientEmailDomains.Contains(emailDomain)) return true;
-            if (Browser.Name == WebBrowser.BrowserName.InternetExplorer && Browser.MajorVersion < 9) return true;
-            return false;
-        }
-
-        private bool AppearsExceptional()
-        {
-            if (YearsExperience > 10) return true;
-            if (HasBlog) return true;
-            if (Certifications.Count() > 3) return true;
-            var preferredEmployers = new List<string>() { "Pluralsight", "Microsoft", "Google" };
-            if (preferredEmployers.Contains(Employer)) return true;
-            return false;
-        }
-
-        private RegisterError? ValidateData()
-        {
-            if (string.IsNullOrWhiteSpace(FirstName)) return RegisterError.FirstNameRequired;
-            if (string.IsNullOrWhiteSpace(LastName)) return RegisterError.LastNameRequired;
-            if (string.IsNullOrWhiteSpace(Email)) return RegisterError.EmailRequired;
-            if (!Sessions.Any()) return RegisterError.NoSessionsProvided;
-            return null;
         }
     }
 }
