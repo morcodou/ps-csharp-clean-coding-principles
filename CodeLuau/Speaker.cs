@@ -35,27 +35,9 @@ namespace CodeLuau
             bool speakerAppearsQualified = AppearsExceptional() || !HasObviousRedFlags();
             if (!speakerAppearsQualified) return new RegisterResponse(RegisterError.SpeakerDoesNotMeetStandards);
 
-            bool apprroved = false;
-            var ot = new List<string>() { "Cobol", "Punch Cards", "Commodore", "VBScript" };
-            foreach (var session in Sessions)
-            {
-                foreach (var tech in ot)
-                {
-                    if (session.Title.Contains(tech) || session.Description.Contains(tech))
-                    {
-                        session.Approved = false;
-                        break;
-                    }
-                    else
-                    {
-                        session.Approved = true;
-                        apprroved = true;
-                    }
-                }
-            }
+            bool atLeastOneSessionApprroved = ApproveSessions();
 
-
-            if (apprroved)
+            if (atLeastOneSessionApprroved)
             {
                 //if we got this far, the speaker is approved
                 //let's go ahead and register him/her now.
@@ -102,6 +84,29 @@ namespace CodeLuau
             return new RegisterResponse((int)speakerId);
         }
 
+        private bool ApproveSessions()
+        {
+            foreach (var session in Sessions)
+            {
+                session.Approved = !SessionIsAboutOldTechnology(session);
+            }
+
+            return Sessions.Any(session => session.Approved);
+        }
+
+        private bool SessionIsAboutOldTechnology(Session session)
+        {
+            var oldTechnologies = new List<string>() { "Cobol", "Punch Cards", "Commodore", "VBScript" };
+            foreach (var tech in oldTechnologies)
+            {
+                if (session.Title.Contains(tech) || session.Description.Contains(tech))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         private bool HasObviousRedFlags()
         {
             string emailDomain = Email.Split('@').Last();
