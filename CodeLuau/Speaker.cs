@@ -29,11 +29,24 @@ namespace CodeLuau
 		{
 			int? speakerId = null;
 
-			if (!string.IsNullOrWhiteSpace(FirstName))
+
+			if (string.IsNullOrWhiteSpace(FirstName))
 			{
-				if (!string.IsNullOrWhiteSpace(LastName))
+				return new RegisterResponse(RegisterError.FirstNameRequired);
+			}
+			else
+			{
+				if (string.IsNullOrWhiteSpace(LastName))
 				{
-					if (!string.IsNullOrWhiteSpace(Email))
+					return new RegisterResponse(RegisterError.LastNameRequired);
+				}
+				else
+				{
+					if (string.IsNullOrWhiteSpace(Email))
+					{
+						return new RegisterResponse(RegisterError.EmailRequired);
+					}
+					else
 					{
 						//put list of employers in array
 						var emps = new List<string>() { "Pluralsight", "Microsoft", "Google" };
@@ -128,19 +141,7 @@ namespace CodeLuau
 							return new RegisterResponse(RegisterError.SpeakerDoesNotMeetStandards);
 						}
 					}
-					else
-					{
-						return new RegisterResponse(RegisterError.EmailRequired);
-					}
 				}
-				else
-				{
-					return new RegisterResponse(RegisterError.LastNameRequired);
-				}
-			}
-			else
-			{
-				return new RegisterResponse(RegisterError.FirstNameRequired);
 			}
 
 			//if we got this far, the speaker is registered.
